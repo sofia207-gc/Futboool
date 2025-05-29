@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {  Button } from "react-bootstrap"
+import "./ListarPresi.css"
 
 interface Presiden{
     dni:number,
     nombre:string
 }
 const ListarPresi:React.FC=()=>{
-     const navigate= useNavigate();
+    const navigate= useNavigate();
     const [mensaje,setMensaje]=useState<Presiden[]>([])
     const listar= async()=>{
         const res=await fetch('http://localhost:1111/presidentes')
@@ -37,6 +38,7 @@ const ListarPresi:React.FC=()=>{
     },[])
     return(
         <div>
+              <Button className="boton-flotante"onClick={() => navigate('/CrearPresi')}>+ Crear Presidente</Button>
             <table>
                 <thead>
                     <tr>

@@ -7,7 +7,7 @@ const FormularioPresid: React.FC = () => {
 
   const guardarPresi = async (e: React.FormEvent) => {
     e.preventDefault(); // Evita recargar la página
-    const response = await fetch("http://localhost:1111/presidentes", {
+    const response = await fetch("http://localhost:3333/presidentes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ dni, nombre }),

@@ -7,7 +7,7 @@ const FormularioEqui: React.FC = () => {
   const [anio_fundacion, setAnioFundacion] = useState("");
 
   const guardarEqui = async () => {
-    const response = await fetch("http://localhost:1111/equipos", {
+    const response = await fetch("http://localhost:3333/equipos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ codigo, nombre, anio_fundacion }),
