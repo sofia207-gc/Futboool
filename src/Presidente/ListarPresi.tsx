@@ -3,53 +3,65 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import "./ListarPresi.css";
 
-interface Presiden {
+interface Presidente {
   dni: number;
   nombre: string;
 }
 
 const ListarPresi: React.FC = () => {
   const navigate = useNavigate();
-  const [mensaje, setMensaje] = useState<Presiden[]>([]);
+  const [presidentes, setPresidentes] = useState<Presidente[]>([]);
   const [filtro, setFiltro] = useState<string>("");
 
-  const listar = async () => {
-    const res = await fetch("http://localhost:1111/presidentes");
-    const msj = await res.json();
-    console.log(msj);
-    setMensaje(msj.mensaje);
-  };
-
-  const Eliminar = async (id: number) => {
-    const seguro = confirm("¿Estás seguro de que quieres eliminar este presidente?");
-    if (!seguro) {
-      return;
+  // Cargar lista de presidentes
+  const listarPresidentes = async () => {
+    try {
+      const res = await fetch("http://localhost:1111/presidentes");
+      const data = await res.json();
+      console.log(data);
+      setPresidentes(data.mensaje); // Ajusta según tu backend
+    } catch (error) {
+      console.error("Error al cargar presidentes:", error);
     }
-    const respE = await fetch(`http://localhost:1111/presidentes/${id}`, {
-      method: "DELETE",
-    });
-    const msjE = await respE.json();
-    console.log(msjE);
-    listar(); // volver a cargar la lista después de eliminar
   };
 
-  const llevarA = (ids: number) => {
-    navigate("/ActualizarEditorial", { state: { ids: ids } });
+  // Eliminar presidente
+  const eliminarPresidente = async (dni: number) => {
+    const confirmado = confirm("¿Estás seguro de que quieres eliminar este presidente?");
+    if (!confirmado) return;
+
+    try {
+      const res = await fetch(`http://localhost:1111/presidentes/${dni}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Error al eliminar presidente");
+      await res.json();
+      listarPresidentes(); // recarga lista
+    } catch (error) {
+      alert("No se pudo eliminar el presidente.");
+      console.error(error);
+    }
+  };
+
+  // Navegar a actualizar con el dni como parámetro de URL
+  const irActualizar = (dni: number) => {
+    navigate(`/actualizarPresidente/${dni}`);
   };
 
   useEffect(() => {
-    listar();
+    listarPresidentes();
   }, []);
 
   // Filtrado por nombre o dni
-  const mensajeFiltrado = mensaje.filter((presi) =>
-    presi.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
-    presi.dni.toString().includes(filtro)
+  const presidentesFiltrados = presidentes.filter(
+    (p) =>
+      p.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
+      p.dni.toString().includes(filtro)
   );
 
   return (
     <div>
-      <Button className="boton-flotante" onClick={() => navigate("/CrearPresi")}>
+      <Button className="boton-flotante" onClick={() => navigate("/crearPresidente")}>
         + Crear Presidente
       </Button>
 
@@ -70,15 +82,19 @@ const ListarPresi: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {mensajeFiltrado.map((index) => (
-            <tr key={index.dni}>
-              <td>{index.dni}</td>
-              <td>{index.nombre}</td>
+          {presidentesFiltrados.map((presi) => (
+            <tr key={presi.dni}>
+              <td>{presi.dni}</td>
+              <td>{presi.nombre}</td>
               <td>
-                <Button variant="danger" onClick={() => Eliminar(index.dni)}>Eliminar</Button>
+                <Button variant="danger" onClick={() => eliminarPresidente(presi.dni)}>
+                  Eliminar
+                </Button>
               </td>
               <td>
-                <Button variant="primary" onClick={() => llevarA(index.dni)}>Actualizar</Button>
+                <Button variant="primary" onClick={() => irActualizar(presi.dni)}>
+                  Actualizar
+                </Button>
               </td>
             </tr>
           ))}
@@ -89,3 +105,4 @@ const ListarPresi: React.FC = () => {
 };
 
 export default ListarPresi;
+

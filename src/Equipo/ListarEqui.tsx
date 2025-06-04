@@ -18,27 +18,30 @@ const ListarEquipo: React.FC = () => {
     const res = await fetch("http://localhost:3333/equipos");
     const msj = await res.json();
     console.log(msj);
-    setMensaje(msj.mensaje);
+    setMensaje(msj.mensaje); // Asegúrate que tu backend responde con { mensaje: [...] }
   };
 
   const EliminarEquipo = async (id: number) => {
     const seguro = confirm("¿Estás seguro de que quieres eliminar este equipo?");
-    if (!seguro) {
-      return;
+    if (!seguro) return;
+
+    try {
+      const resEl = await fetch(`http://localhost:3333/equipos/${id}`, {
+        method: "DELETE",
+      });
+      if (!resEl.ok) throw new Error("Error al eliminar equipo.");
+      await resEl.json();
+      ListarEquipos(); // Recargar la lista
+    } catch (error) {
+      alert("No se pudo eliminar el equipo.");
+      console.error("Error:", error);
     }
-    const resEl = await fetch(`http://localhost:3333/equipos/${id}`, {
-      method: "DELETE",
-    });
-    const msjEl = await resEl.json();
-    console.log(msjEl);
-    ListarEquipos(); 
   };
 
   useEffect(() => {
     ListarEquipos();
   }, []);
 
-  // Filtrar equipos por nombre, presidente o año de fundación
   const equiposFiltrados = mensaje.filter((equipo) =>
     equipo.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
     equipo.presidente.toLowerCase().includes(filtro.toLowerCase()) ||
@@ -77,15 +80,12 @@ const ListarEquipo: React.FC = () => {
               <td>{equipo.presidente}</td>
               <td>{equipo.anio_de_fundacion}</td>
               <td>
-                <Button
-                  variant="danger"
-                  onClick={() => EliminarEquipo(equipo.codigo)}
-                >
-                  Eliminar Equipo
+                <Button variant="danger" onClick={() => EliminarEquipo(equipo.codigo)}>
+                  Eliminar
                 </Button>
               </td>
               <td>
-                <Button variant="warning" onClick={() => { /* lógica actualizar */ }}>
+                <Button variant="warning" onClick={() => navigate(`/actualizar/${equipo.codigo}`)}>
                   Actualizar
                 </Button>
               </td>

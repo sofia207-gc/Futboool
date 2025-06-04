@@ -12,10 +12,10 @@ const FiltrarPresi: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Cambia esta URL por la de tu backend real
     fetch('http://localhost:3000/presidentes')
-      .then((res) => res.json()) 
+      .then((res) => res.json())
       .then((data: Presidente[]) => {
+        console.log("Datos recibidos:", data);
         setPresidentes(data);
         setLoading(false);
       })
@@ -25,16 +25,16 @@ const FiltrarPresi: React.FC = () => {
       });
   }, []);
 
-  const presidentesFiltrados = presidentes.filter(presi =>
+  const presidentesFiltrados = presidentes.filter((presi) =>
     presi.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
-    presi.dni.toString().includes(filtro.toString())
+    presi.dni.toString().includes(filtro.toLowerCase())
   );
 
   return (
     <div className="p-4">
       <input
         type="text"
-        placeholder="Buscar por nombre o dni"
+        placeholder="Buscar por nombre o DNI"
         value={filtro}
         onChange={(e) => setFiltro(e.target.value)}
         className="border p-2 mb-4 w-full"
@@ -42,6 +42,8 @@ const FiltrarPresi: React.FC = () => {
 
       {loading ? (
         <p>Cargando datos...</p>
+      ) : presidentesFiltrados.length === 0 ? (
+        <p>No se encontraron presidentes con ese filtro.</p>
       ) : (
         <ul>
           {presidentesFiltrados.map((presi) => (

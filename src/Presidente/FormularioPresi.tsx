@@ -7,12 +7,35 @@ const FormularioPresid: React.FC = () => {
 
   const guardarPresi = async (e: React.FormEvent) => {
     e.preventDefault(); // Evita recargar la página
-    const response = await fetch("http://localhost:3333/presidentes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dni, nombre }),
-    });
-    console.log(await response.json());
+
+    // Validación básica
+    if (!dni || !nombre) {
+      alert("Por favor completa todos los campos.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3333/presidentes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dni, nombre }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error en la solicitud: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Respuesta del servidor:", data);
+      alert("Presidente guardado correctamente");
+
+      // Limpia los campos
+      setDni("");
+      setNombre("");
+    } catch (error) {
+      console.error("Error al guardar presidente:", error);
+      alert("Ocurrió un error al guardar el presidente.");
+    }
   };
 
   return (
