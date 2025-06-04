@@ -36,14 +36,14 @@ const ListarPresi: React.FC = () => {
       });
       if (!res.ok) throw new Error("Error al eliminar presidente");
       await res.json();
-      listarPresidentes(); // recarga lista
+      listarPresidentes(); 
     } catch (error) {
       alert("No se pudo eliminar el presidente.");
       console.error(error);
     }
   };
 
-  // Navegar a actualizar con el dni como parámetro de URL
+
   const irActualizar = (dni: number) => {
     navigate(`/actualizarPresidente/${dni}`);
   };
@@ -52,7 +52,6 @@ const ListarPresi: React.FC = () => {
     listarPresidentes();
   }, []);
 
-  // Filtrado por nombre o dni
   const presidentesFiltrados = presidentes.filter(
     (p) =>
       p.nombre.toLowerCase().includes(filtro.toLowerCase()) ||

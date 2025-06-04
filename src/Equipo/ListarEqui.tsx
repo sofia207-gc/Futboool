@@ -18,7 +18,7 @@ const ListarEquipo: React.FC = () => {
     const res = await fetch("http://localhost:3333/equipos");
     const msj = await res.json();
     console.log(msj);
-    setMensaje(msj.mensaje); // Asegúrate que tu backend responde con { mensaje: [...] }
+    setMensaje(msj.mensaje); 
   };
 
   const EliminarEquipo = async (id: number) => {
