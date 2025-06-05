@@ -6,15 +6,17 @@ import ListarEquipo from "./Equipo/ListarEqui";
 import ListarPresi from './Presidente/ListarPresi';
 import './index.css'
 
+
 function App() {
   return (
     <Router>
       <Navbar /> 
       <Routes>
         <Route path="/" element={<FormularioEqui />} />
-        <Route path="/CrearPresi" element={<FormularioPresid />} />
+        <Route path="/FormularioPresi" element={<FormularioPresid/>} />
         <Route path="/ListarEquipo" element={<ListarEquipo />} />
         <Route path="/ListarPresi" element={<ListarPresi />} />
+
       </Routes>
     </Router>
   );

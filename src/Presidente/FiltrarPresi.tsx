@@ -12,8 +12,7 @@ const FiltrarPresi: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Cambia esta URL por la de tu backend real
-    fetch('http://localhost:3000/presidentes')
+    fetch('http://localhost:1111/presidentes')
       .then((res) => res.json()) 
       .then((data: Presidente[]) => {
         setPresidentes(data);
@@ -34,7 +33,7 @@ const FiltrarPresi: React.FC = () => {
     <div className="p-4">
       <input
         type="text"
-        placeholder="Buscar por nombre o dni"
+        placeholder="Buscar por dni presidente"
         value={filtro}
         onChange={(e) => setFiltro(e.target.value)}
         className="border p-2 mb-4 w-full"

@@ -1,55 +1,78 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import ActualizarPresidenteModal from "./ActualizarPresidente";
 import "./ListarPresi.css";
 
-interface Presiden {
+interface Presidente {
   dni: number;
   nombre: string;
 }
 
-const ListarPresi: React.FC = () => {
-  const navigate = useNavigate();
-  const [mensaje, setMensaje] = useState<Presiden[]>([]);
+const ListarPresidente: React.FC = () => {
+  const [presidentes, setPresidentes] = useState<Presidente[]>([]);
   const [filtro, setFiltro] = useState<string>("");
+  const [presidenteAEditar, setPresidenteAEditar] = useState<Presidente | null>(null);
 
-  const listar = async () => {
-    const res = await fetch("http://localhost:1111/presidentes");
-    const msj = await res.json();
-    console.log(msj);
-    setMensaje(msj.mensaje);
-  };
-
-  const Eliminar = async (id: number) => {
-    const seguro = confirm("¿Estás seguro de que quieres eliminar este presidente?");
-    if (!seguro) {
-      return;
+  const listarPresidentes = async () => {
+    try {
+      const res = await fetch("http://localhost:1111/presidentes");
+      const data = await res.json();
+      setPresidentes(data.mensaje);
+    } catch (error) {
+      console.error("Error al cargar presidentes:", error);
     }
-    const respE = await fetch(`http://localhost:1111/presidentes/${id}`, {
-      method: "DELETE",
-    });
-    const msjE = await respE.json();
-    console.log(msjE);
-    listar(); // volver a cargar la lista después de eliminar
   };
 
-  const llevarA = (ids: number) => {
-    navigate("/ActualizarEditorial", { state: { ids: ids } });
+  const eliminarPresidente = async (dni: number) => {
+    const confirmado = confirm("¿Estás seguro de que quieres eliminar este presidente?");
+    if (!confirmado) return;
+
+    try {
+      const res = await fetch(`http://localhost:1111/presidentes/${dni}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Error al eliminar presidente");
+      await res.json();
+      listarPresidentes();
+    } catch (error) {
+      alert("No se pudo eliminar el presidente.");
+      console.error("Error:", error);
+    }
+  };
+
+  const actualizarPresidente = async (presidente: Presidente) => {
+    try {
+      const res = await fetch(`http://localhost:1111/presidentes/${presidente.dni}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(presidente),
+      });
+
+      if (!res.ok) throw new Error("Error al actualizar presidente.");
+      await res.json();
+      alert("Presidente actualizado correctamente.");
+      setPresidenteAEditar(null);
+      listarPresidentes();
+    } catch (error) {
+      alert("No se pudo actualizar el presidente.");
+      console.error("Error:", error);
+    }
   };
 
   useEffect(() => {
-    listar();
+    listarPresidentes();
   }, []);
 
-  // Filtrado por nombre o dni
-  const mensajeFiltrado = mensaje.filter((presi) =>
-    presi.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
-    presi.dni.toString().includes(filtro)
+  const presidentesFiltrados = presidentes.filter((p) =>
+    p.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
+    p.dni.toString().includes(filtro)
   );
 
   return (
     <div>
-      <Button className="boton-flotante" onClick={() => navigate("/CrearPresi")}>
+      <Button className="boton-flotante" onClick={() => window.location.href = "/FormularioPresi"}>
         + Crear Presidente
       </Button>
 
@@ -70,22 +93,34 @@ const ListarPresi: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {mensajeFiltrado.map((index) => (
-            <tr key={index.dni}>
-              <td>{index.dni}</td>
-              <td>{index.nombre}</td>
+          {presidentesFiltrados.map((presi) => (
+            <tr key={presi.dni}>
+              <td>{presi.dni}</td>
+              <td>{presi.nombre}</td>
               <td>
-                <Button variant="danger" onClick={() => Eliminar(index.dni)}>Eliminar</Button>
+                <Button variant="danger" onClick={() => eliminarPresidente(presi.dni)}>
+                  Eliminar
+                </Button>
               </td>
               <td>
-                <Button variant="primary" onClick={() => llevarA(index.dni)}>Actualizar</Button>
+                <Button variant="warning" onClick={() => setPresidenteAEditar(presi)}>
+                  Actualizar
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {presidenteAEditar && (
+        <ActualizarPresidenteModal
+          presidente={presidenteAEditar}
+          onClose={() => setPresidenteAEditar(null)}
+          onUpdate={actualizarPresidente}
+        />
+      )}
     </div>
   );
 };
 
-export default ListarPresi;
+export default ListarPresidente;

@@ -1,18 +1,20 @@
 import { useState } from "react";
 import "./FormularioPresii.css";
+import { Alert } from "react-bootstrap";
 
 const FormularioPresid: React.FC = () => {
-  const [dni, setDni] = useState("");
   const [nombre, setNombre] = useState("");
+    const [mensaje, setMensaje] = useState<string>('');
 
   const guardarPresi = async (e: React.FormEvent) => {
     e.preventDefault(); // Evita recargar la página
-    const response = await fetch("http://localhost:3333/presidentes", {
+    const response = await fetch("http://localhost:1111/presidentes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dni, nombre }),
+      body: JSON.stringify({nombre }),
     });
-    console.log(await response.json());
+    const msj = await response.json();
+        setMensaje(msj.mensaje);
   };
 
   return (
@@ -20,16 +22,6 @@ const FormularioPresid: React.FC = () => {
       <div className="formularioo">
         <form onSubmit={guardarPresi}>
           <h1>Formulario Presidente</h1>
-
-          <div className="form-group">
-            <label htmlFor="dni">DNI</label>
-            <input
-              id="dni"
-              type="text"
-              value={dni}
-              onChange={(e) => setDni(e.target.value)}
-            />
-          </div>
 
           <div className="form-group">
             <label htmlFor="nombre">Nombre</label>
@@ -43,6 +35,11 @@ const FormularioPresid: React.FC = () => {
 
           <button type="submit">Guardar</button>
         </form>
+        {mensaje && (
+                    <Alert variant="info" className="mt-3 text-center">
+                        {mensaje}
+                    </Alert>
+                )}
       </div>
     </div>
   );
